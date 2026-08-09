@@ -1,4 +1,4 @@
-10-25
+Candidate Problem Evaluation
 The candidate problem is the operational inefficiencies, high costs, and delays caused by reliance on manual, static, and unoptimized route planning in logistics and fleet delivery operations. The overall need can be summarised as the need for an automated, constraint-aware route optimization and dynamic dispatch system that replaces manual route planning, improves fleet resource utilization, and provides real-time visibility across logistics operations.
 For a Logistics Route Design System, stakeholder access evaluates where and how you will obtain real-world data and feedback for each role:
 	Fleet Dispatchers / Route Planners: Accessible through interviews or observations with administrative personnel at local courier services, university campus transport offices, or retail distribution hubs. 
@@ -12,7 +12,7 @@ The system must balance multiple competing dynamic variables simultaneously:
 	Spatial/Temporal Constraints: Distance matrices, dynamic speed limits, and travel time variability.
 2. Stateful Workflow Lifecycle
 Routes and orders do not exist in a static state; they progress through an event-driven lifecycle:
-"Draft"⟶"Optimized"⟶"Assigned"⟶"In-Transit"⟶{■("Completed" @"Delayed / Exception" )}
+"Draft" ⟶ "Optimized" ⟶ "Assigned" ⟶ "In-Transit" ⟶ {("Completed" @"Delayed / Exception")}
 Each state transition enforces strict business rules (e.g., a driver cannot mark a route as In-Transit without dispatcher approval and capacity validation).
 3. Rule Enforcement & Business Logic
 	Dynamic Re-sequencing: Rules for automatically dropping an unreachable stop or shifting delayed deliveries to an available secondary vehicle.
@@ -36,7 +36,7 @@ Each state transition enforces strict business rules (e.g., a driver cannot mark
 	Regulatory Workload Hours: Business rules strictly enforce maximum continuous driving hours and mandatory rest breaks prior to route generation.
 	Vehicle Load Enforcement: Hard systemic checks block route finalization if total assigned parcel weights or volumes exceed maximum legal vehicle payload limits.
 
-25-45
+
 	Problem Statement
 Logistics operators and fleet dispatchers currently face critical operational bottlenecks due to reliance on manual, static, and unoptimized route planning processes. Route planners depend on outdated personal experience or disconnected spreadsheet models, which fail to dynamically accommodate real-time delivery constraints, vehicle payload limits, driver shift regulations, fluctuating fuel costs, and unexpected traffic delays. This reliance on manual routing leads to excessive fuel consumption, long route distances, frequent delivery delays, and inflated operational expenses. Furthermore, delivery drivers in the field lack real-time updates when route adjustments or customer cancellations occur during active dispatch runs. Management lacks centralized visibility into real-time fleet performance metrics, route variance, and operational costs, preventing data-driven decision-making. Without an automated, constraint-aware route design system that optimizes delivery sequences and enforces load capacities while managing stateful workflows, logistics organizations will continue to suffer from high operational overhead, driver burnout, and inconsistent customer service quality.
 
