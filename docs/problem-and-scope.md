@@ -43,8 +43,37 @@ Logistics operators and fleet dispatchers currently face critical operational bo
 2. Project Goal
 	Goal: To design and implement a stateful route design and optimization system that automates vehicle delivery sequencing, enforces operational constraints, and dynamically manages dispatch workflows to reduce logistics operational costs. 
 Measurable Objectives
-	Planning Efficiency: Reduce the average daily planning time for dispatchers from 2 hours to under 15 minutes per batch of delivery orders. 
+	Planning Efficiency: Reduce the average daily planning time for dispatchers from 2 hours to under 15 minutes per batch of delivery orders.
 	Fuel & Distance Optimization: Decrease total distance driven and fleet fuel consumption by at least 15% across active delivery routes compared to baseline manual planning. 
 	On-Time Delivery Performance: Increase the overall on-time delivery completion rate from 78% to over 92% within the initial operational deployment phase.
+In Scope
+•	Automated route optimization engine that sequences delivery stops based on vehicle capacity, time windows, and priority orders.
+•	Dispatcher interface for creating, reviewing, and approving optimized routes before assignment.
+•	Stateful order and route lifecycle management (Draft, Optimized, Assigned, In Transit, Completed, Delayed, Exception) with enforced transition rules.
+•	Dynamic resequencing logic for unreachable stops or delayed deliveries.
+•	Overcapacity prevention checks (weight and volume validation before route finalization).
+•	Driver facing view showing assigned route, ETA, and status updates (hands free, low distraction design).
+•	Role based access control separating dispatcher, driver, and manager permissions.
+•	Integration with an external mapping and geocoding API (for example OpenStreetMap) for distance and time matrices.
+•	Basic operational dashboard for managers (route variance, on time performance, distance and fuel estimates).
+Out of Scope
+•	Building a custom mapping and geocoding engine. The team relies on an external API (see Decision D001) rather than developing routing algorithms from raw map data.
+•	Payment processing or billing integration.
+•	Native mobile apps. Driver and dispatcher interfaces will be web based only this semester.
+•	Predictive analytics and machine learning based demand forecasting.
+•	Full production grade GPS live tracking. The system uses throttled or simulated pings, not continuous live tracking infrastructure.
+•	Multi company or multi tenant support. The system is scoped to a single fleet operator.
+Assumptions
+•	Test data (addresses, orders, vehicle profiles) can be adequately simulated using Gaborone based mock data without needing live production data.
+•	The external mapping API (OpenStreetMap or Mapbox) will remain available and free or low cost for the semester's usage volume.
+•	Drivers and dispatchers have basic smartphone or web access sufficient to use the interfaces.
+•	Regulatory driving hour rules can be approximated with a simplified rule set rather than full legal jurisdictional compliance.
+Constraints
+•	Semester timeline restricts scope to a vertical slice. Core focus is orchestration, state management, and business logic, not custom optimization algorithms.
+•	Team's technical stack is fixed to a Java and SQL backend with a web frontend.
+•	No access to real operator or customer data. The team relies on mock and synthetic datasets, and PII must still be protected via RBAC even in test data.
+•	Network and API cost constraints require GPS ping frequency to be throttled rather than continuous.
+•	No specialized hardware (for example dedicated GPS trackers). The system is reliant on standard device sensors.
+
 
 
