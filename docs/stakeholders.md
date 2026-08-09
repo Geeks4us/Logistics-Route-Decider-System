@@ -1,1 +1,6 @@
-
+| Stakeholder | Need | Concern | Evidence |
+|---|---|---|---|
+| **Fleet Dispatchers** | • Real-time communication tools• Route generation and adjustments• Visibility of active deliveries through GPS tracking | • Sudden route changes or vehicle breakdowns• Difficulty responding to traffic changes or delivery cancellations• Missing delivery windows and under-utilized assets | Observations with personnel at local courier services |
+| **Delivery Drivers** | • GPS navigation tools• Real-time updates• Clear and fast routes• Minimal interaction with the system while driving | • Unfamiliar routes• Lack of awareness about route or delivery changes• Traffic and delays in delivery• Too much interaction with the system may cause a distraction | Surveys with delivery drivers |
+| **Logistics Managers** | • Proof of delivery software• Operational cost metrics• Route efficiency reports | • Maintaining real-time delivery visibility• Rising fuel and transport costs• Delivery delays | Published operational case studies |
+| **End Customers/Recipients** | • Fast and reliable deliveries• The ability to track their deliveries• Real-time notifications about delays or changes | • Late or missed deliveries• Lack of tracking information• Random delivery changes | Interviews with the public about their delivery experiences |
