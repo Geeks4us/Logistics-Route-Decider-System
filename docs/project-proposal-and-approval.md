@@ -49,4 +49,5 @@ All detailed evidence required for Laboratory 2 is committed in the following re
 | **Team Member** | David Ukandu | 202306298 | *[Committed via Git]* — 07 Aug 2026 |
 | **Team Member** | Smarts Ngubo | 202003253 | *[Committed via Git]* — 07 Aug 2026 |
 | **Team Member** | Weno Phatshwane | 202206615 | *[Committed via Git]* — 07 Aug 2026 |
+| **Team Member** | Lindiwe Mamelala | 202306277 | *[Committed via Git]* — 07 Aug 2026 |
 | **CSI473 Lecturer / Tutor** | Dr. Cleverence Kombe | Department of Computer Science | Pending Approval — 07 Aug 2026 |
