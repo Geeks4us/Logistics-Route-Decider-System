@@ -44,9 +44,6 @@ ACTORS AND THEIR GOALS
         └──────────────────────────────────────────────────────────┘
                                       
 
-                         External Mapping API
-                                  │
-                                  ↓
-                    (Get Distance/Travel-Time Data)
+   
 
 
