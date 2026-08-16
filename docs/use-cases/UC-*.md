@@ -4,11 +4,14 @@ USE CASE NAME: Optimized delivery process.
 USE CASE ID: UC 25
 
 Primary actor: Route dispatcher
+
 Secondary actor: External Mapping API
+
 Goal: Generate an effective and functional delivery route that satisfies vehicle capacity, delivery time window and operational constraints.
+
 Trigger: Dispatcher selects an order batch and asks the system to generate an optimized route.
 
-Preconditions
+Preconditions:
 •	An order batch exists in "Draft" state with at least one order waiting for an order confirmation.
 •	Each order has a delivery address, delivery time window and payload weight/volume.
 •	At least one vehicle is available and marked active, with known payload capacity and driver shift limits on file.
