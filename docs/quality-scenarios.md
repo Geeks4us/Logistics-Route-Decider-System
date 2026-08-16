@@ -43,8 +43,6 @@ Security
 
  
 
-100% unauthorized-access attempts blocked 
-
  
 
 
