@@ -1,6 +1,6 @@
 FULL DRESSED CORE USE CASE WITH PRECONDITIONS, POSTCONDITIONS AND ALTERNATIVE FLOWS
 
-USE CASE NAME: Optimized delivery process
+USE CASE NAME: Optimized delivery process.
 USE CASE ID: UC 25
 
 Primary actor: Route dispatcher
@@ -34,22 +34,26 @@ Alternative 1 – Vehicle Over Capacity
 2.	The system prevents route finalization. 
 3.	The system informs the dispatcher that the vehicle is over capacity. 
 4.	Dispatcher changes the vehicle or adjusts the assigned orders. 
-5.	The dispatcher requests optimization again. 
+5.	The dispatcher requests optimization again.
+   
 Alternative 2 – Delivery Stop Cannot Be Reached
 1.	The system determines that a delivery stop cannot be reached using the available route information. 
 2.	The system removes or flags the unreachable stop. 
 3.	The system re-sequences the remaining deliveries. 
-4.	The system presents the revised route to the dispatcher. 
+4.	The system presents the revised route to the dispatcher.
+   
 Alternative 3 – Mapping API Unavailable
 1.	The system cannot obtain the required distance or travel-time information. 
 2.	The system does not finalize the optimized route. 
 3.	The system informs the dispatcher that route optimization cannot currently be completed. 
-4.	The dispatcher can retry when the mapping service becomes available again. 
+4.	The dispatcher can retry when the mapping service becomes available again.
+   
 Alternative 4 – Driver Working-Hour Constraint Violated
 1.	The system determines that the proposed route exceeds the driver's permitted working hours. 
 2.	The system rejects the route sequence. 
 3.	The system adjusts the route or requires another driver/route configuration. 
 4.	The system generates a new route that doesn’t exceed the driver’s shift limit.
+   
 Postconditions
 1.	Success: The batch's state moves from Draft to Optimized.
 •	Constraints are checked and validated.
