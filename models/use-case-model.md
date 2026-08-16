@@ -19,4 +19,39 @@ ACTORS AND THEIR GOALS
 •	Provide the route and geographical information including distance matrix.
 •	The time taken to travel for route optimization.
 
+                         LOGISTICS ROUTE DESIGN SYSTEM
+        ┌──────────────────────────────────────────────────────────┐
+        │                                                          │
+        │  (Create Delivery Order)                                 │
+        │  (Optimize Delivery Route)                               │
+        │  (Review Optimized Route)                                │
+        │  (Approve Route)                                         │
+        │  (Assign Route to Driver)                                │
+        │  (Re-sequence Route)                                     │
+        │  (Manage Delayed/Exception Delivery)                     │
+        │                                                          │
+        │  (View Assigned Route)                                   │
+        │  (View ETA)                                              │
+        │  (Update Delivery Status)                                │
+        │  (Complete Delivery)                                     │
+        │                                                          │
+        │  (View Operational Dashboard)                            │
+        │  (Monitor Route Performance)                             │
+        │                                                          │
+        │  (View Delivery Status/ETA)                              │
+        │                                                          │
+        │  (Get Distance/Travel-Time Data)                         │
+        │                                                          │
+        └──────────────────────────────────────────────────────────┘
+             ↑                 ↑                ↑              ↑
+             │                 │                │              │
+      Dispatcher/        Delivery Driver   Logistics       Customer
+      Route Planner                       Manager
+                                                    
+
+                         External Mapping API
+                                  │
+                                  ↓
+                    (Get Distance/Travel-Time Data)
+
 
