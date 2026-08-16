@@ -24,30 +24,25 @@ ACTORS AND THEIR GOALS
         │                                                          │
         │  (Create Delivery Order)                                 │
         │  (Optimize Delivery Route)                               │
-        │  (Review Optimized Route)                                │
+        │  (Review Optimized Route)                                │------> Route dispatcher
         │  (Approve Route)                                         │
-        │  (Assign Route to Driver)                                │
-        │  (Re-sequence Route)                                     │
+        │  (Assign Route to Driver)                                │                                     │
         │  (Manage Delayed/Exception Delivery)                     │
         │                                                          │
         │  (View Assigned Route)                                   │
-        │  (View ETA)                                              │
+        │  (View ETA)                                              │------> Delivery driver
         │  (Update Delivery Status)                                │
         │  (Complete Delivery)                                     │
         │                                                          │
         │  (View Operational Dashboard)                            │
-        │  (Monitor Route Performance)                             │
+        │  (Monitor Route and Delivery Performance)                │------> Logistics manager
         │                                                          │
-        │  (View Delivery Status/ETA)                              │
+        │  (View and update Delivery Status/ETA)                   │------> Customer
         │                                                          │
-        │  (Get Distance/Travel-Time Data)                         │
+        │  (Get Distance/Travel-Time Data)                         │------> API
         │                                                          │
         └──────────────────────────────────────────────────────────┘
-             ↑                 ↑                ↑              ↑
-             │                 │                │              │
-      Dispatcher/        Delivery Driver   Logistics       Customer
-      Route Planner                       Manager
-                                                    
+                                      
 
                          External Mapping API
                                   │
