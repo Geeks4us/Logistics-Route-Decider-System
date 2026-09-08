@@ -1,1 +1,77 @@
+@startuml DomainModel_LogisticsRouteDecider
+skinparam classAttributeIconSize 0
 
+class OrderBatch {
+  + batchID: String
+  + createdAt: DateTime
+  + status: BatchStatus
+  + validateOrders(): Boolean
+  + aggregateWeight(): Float
+  + aggregateVolume(): Float
+}
+
+class DeliveryOrder {
+  + orderID: String
+  + destinationAddress: String
+  + weight: Float
+  + volume: Float
+  + windowStart: DateTime
+  + windowEnd: DateTime
+  + priorityLevel: String
+  + status: OrderStatus
+}
+
+class DeliveryRoute {
+  + routeID: String
+  + totalDistance: Float
+  + totalEstimatedTime: Float
+  + status: RouteStatus
+  + sequenceStops(): Void
+  + calculateDuration(): Float
+}
+
+class DeliveryStop {
+  + stopIndex: Int
+  + address: String
+  + estimatedArrivalTime: DateTime
+  + isReachable: Boolean
+  + verifyWindow(): Boolean
+}
+
+class Vehicle {
+  + vehicleID: String
+  + maxWeight: Float
+  + maxVolume: Float
+  + status: VehicleStatus
+  + validatePayload(weight: Float, volume: Float): Boolean
+}
+
+class Driver {
+  + driverID: String
+  + name: String
+  + maxShiftLimit: Float
+  + currentDutyHours: Float
+  + status: DriverStatus
+}
+
+OrderBatch "1" *-- "1..*" DeliveryOrder : contains >
+DeliveryRoute "1" *-- "1..*" DeliveryStop : comprises >
+DeliveryOrder "1" -- "1" DeliveryStop : fulfilled at >
+DeliveryRoute "0..1" -- "1" Vehicle : assigned to >
+DeliveryRoute "0..1" -- "1" Driver : driven by >
+
+enum BatchStatus {
+  Draft
+  Optimized
+}
+
+enum RouteStatus {
+  Draft
+  Optimized
+  Assigned
+  InTransit
+  Completed
+  Delayed
+  Exception
+}
+@enduml
