@@ -1,1 +1,14 @@
+# Requirements Traceability Matrix
 
+| Requirement ID | Requirement Description | Target Use Case | Domain Class / Service | Verification Method |
+| :--- | :--- | :--- | :--- | :--- |
+| **FR01** | Dispatcher creates order batch with address, window, priority[cite: 15] | UC-01 (Create Batch)[cite: 8] | `OrderBatch`, `DeliveryOrder`[cite: 11] | Unit Test / UI Test |
+| **FR02** | Generate optimized route based on priority, windows, capacity[cite: 15] | UC-02 (Optimize Route)[cite: 8] | `DeliveryRoute`, `RouteOptimizationService`[cite: 11] | Algorithm Simulation Test |
+| **FR03** | Reject assignments exceeding vehicle weight/volume capacity[cite: 15] | UC-02 (Optimize Route)[cite: 8] | `Vehicle` (`validatePayload()`)[cite: 10, 11] | Automated Integration Test |
+| **FR04** | Dispatcher approves or rejects route before driver assignment[cite: 15] | UC-03 (Approve Route)[cite: 8] | `DeliveryRoute`[cite: 11] | System Integration Test |
+| **FR05** | Enforce route status transitions (Draft, Optimized, Assigned, etc.)[cite: 15] | UC-04 (Manage Status)[cite: 8] | `DeliveryRoute` (`status`)[cite: 10] | State Transition Unit Test |
+| **FR06** | Auto-resequence route when stop is unreachable or delayed[cite: 15] | UC-05 (Resequence Route)[cite: 8] | `DeliveryStop`, `DeliveryRoute`[cite: 10, 11] | Scenario Simulation Test |
+| **FR07** | Notify assigned driver when dispatcher modifies active route[cite: 15] | UC-06 (Driver Notification)[cite: 8] | `NotificationService`, `Driver` | End-to-End Test |
+| **FR08** | Restrict address and contact access via RBAC[cite: 12, 15] | All Use Cases[cite: 8] | `UserSession`, `RoleController`[cite: 12] | Security Audit / Penetration Test |
+| **FR09** | Retrieve distance and time data from external mapping API[cite: 12, 15] | UC-02 (Optimize Route)[cite: 8] | `ExternalMappingService`[cite: 11, 12] | Mock API Integration Test |
+| **FR10** | Display on-time completion rates on manager dashboard[cite: 14, 15] | UC-07 (View Dashboard)[cite: 8] | `OperationalDashboard`[cite: 8, 14] | Dashboard Data Accuracy Test |
