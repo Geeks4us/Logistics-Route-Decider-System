@@ -1,0 +1,57 @@
+@startuml lifecycle-or-activity
+title Route Lifecycle (State Machine)
+
+[*] --> Draft : order batch created
+
+state Draft {
+  Draft : entry / batch awaits optimization
+  Draft : invariant - no route sequence assigned
+}
+
+state Validating {
+  Validating : do / check order data,\nvehicle capacity, driver shift limits
+}
+
+Draft --> Validating : dispatcher selects batch\nand requests "Generate route" [FR-01]
+
+Validating --> Draft : [vehicle over capacity]\n/ notify dispatcher (Alt-1)
+Validating --> Draft : [mapping API unavailable]\n/ notify dispatcher (Alt-3)
+
+state Optimizing {
+  Optimizing : do / call Optimization Engine,\ncompute sequence + ETA [FR-04]
+}
+
+Validating --> Optimizing : [capacity OK,\nAPI reachable]
+
+Optimizing --> Optimizing : [stop unreachable]\n/ re-sequence remaining\nstops (Alt-2)
+Optimizing --> Optimizing : [driver shift limit exceeded]\n/ drop lowest-priority node,\nrecompute (Alt-4)
+
+Optimizing --> Optimized : [all constraints satisfied]\n/ save route, calculate ETA
+
+state Optimized {
+  Optimized : entry / route visible to\ndispatcher for review
+}
+
+Optimized --> Active : dispatcher confirms route\nand assigns driver [FR-05]
+
+state Active {
+  Active : do / driver follows sequence,\nupdates node status [FR-03]
+}
+
+Active --> Completed : [all DeliveryNodes = Completed]
+Active --> Failed : [driver reports unrecoverable\ndelivery failure]
+
+state Completed {
+  Completed : entry / write to route history [FR-08]
+  Completed : entry / include in daily summary [FR-07]
+}
+
+state Failed {
+  Failed : entry / write to route history [FR-08]
+  Failed : entry / include in daily summary [FR-07]
+}
+
+Completed --> [*]
+Failed --> [*]
+
+@enduml
