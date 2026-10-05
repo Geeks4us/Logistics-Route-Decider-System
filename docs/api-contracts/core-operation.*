@@ -1,1 +1,102 @@
+# API Contract — Generate Optimal Route
 
+## Operation
+
+POST /api/routes/optimize
+
+## Purpose
+
+Generate an optimized delivery route from selected delivery
+nodes and an available driver.
+
+## Actor
+
+Fleet Dispatcher
+
+## Request
+
+{
+  "deliveryNodeIds": [
+    "DN001",
+    "DN002",
+    "DN003"
+  ],
+  "driverId": "DRV001"
+}
+
+## Validation Rules
+
+1. At least one delivery node must be supplied.
+2. All delivery nodes must exist.
+3. Delivery nodes must have valid geographic coordinates.
+4. Delivery nodes must have a Pending status.
+5. The driver must exist.
+6. The driver must be Available.
+7. Only an authenticated Fleet Dispatcher may perform this operation.
+
+## Business Rules
+
+1. Only available drivers may receive a new route.
+2. A delivery node cannot belong to two active routes.
+3. Routes exceeding standard shift hours require manual review.
+4. The dispatcher must review and confirm the generated route
+   before it becomes Active.
+
+## Successful Response
+
+HTTP 200 OK
+
+{
+  "routeId": "RT001",
+  "driverId": "DRV001",
+  "status": "Draft",
+  "waypoints": [
+    {
+      "deliveryNodeId": "DN002",
+      "sequence": 1,
+      "eta": "10:35"
+    },
+    {
+      "deliveryNodeId": "DN001",
+      "sequence": 2,
+      "eta": "10:52"
+    },
+    {
+      "deliveryNodeId": "DN003",
+      "sequence": 3,
+      "eta": "11:15"
+    }
+  ]
+}
+
+## Error Outcomes
+
+400 INVALID_REQUEST
+401 UNAUTHORIZED
+403 FORBIDDEN
+404 DRIVER_NOT_FOUND
+409 DRIVER_UNAVAILABLE
+409 NODE_ALREADY_ASSIGNED
+422 INVALID_NODE_STATUS
+422 ROUTE_EXCEEDS_SHIFT
+503 OPTIMIZATION_UNAVAILABLE
+
+## Processing Flow
+
+Dispatcher
+    ↓
+Validate Request
+    ↓
+Validate Driver and Delivery Nodes
+    ↓
+Optimization Engine
+    ↓
+Calculate Route Sequence and ETAs
+    ↓
+Return Draft Route
+    ↓
+Dispatcher Reviews and Confirms
+    ↓
+Assign Route to Driver
+    ↓
+Route becomes Active
