@@ -1,1 +1,127 @@
+# Lab 10: Navigation Model
+
+**Project:** Logistics-Route-Decider-System  
+**Group:** Group 01 – Geeks4us  
+**Course:** CSI473 – Software Design  
+**Branch:** `lab-10`
+
+## 1. Purpose
+
+The navigation model defines how Fleet Dispatchers and Delivery Drivers move through the system to complete their main tasks. The navigation structure prioritizes direct access to task-related screens and avoids unnecessary navigation steps.
+
+## 2. Navigation Structure
+
+```text
+Logistics-Route-Decider-System
+|
++-- Sign In
+    |
+    +-- Role-Based Dashboard
+        |
+        +-- Fleet Dispatcher
+        |   |
+        |   +-- Dispatch Dashboard
+        |   |   |
+        |   |   +-- Pending Deliveries
+        |   |   |   |
+        |   |   |   +-- Select Delivery Nodes
+        |   |   |
+        |   |   +-- Available Drivers
+        |   |   |   |
+        |   |   |   +-- Select Driver
+        |   |   |
+        |   |   +-- Generate Optimized Route
+        |   |       |
+        |   |       +-- Review Waypoint Sequence and ETAs
+        |   |       |   |
+        |   |       |   +-- Confirm Assignment
+        |   |       |   |
+        |   |       |   +-- Manual Review / Adjust Route
+        |   |       |
+        |   |       +-- Optimization Error / Retry
+        |   |
+        |   +-- Active Routes
+        |   |
+        |   +-- Route History
+        |
+        +-- Delivery Driver
+            |
+            +-- Driver Dashboard
+                |
+                +-- My Active Route
+                    |
+                    +-- Next Delivery
+                        |
+                        +-- View Delivery Details
+                        |
+                        +-- Update Delivery Status
+                            |
+                            +-- Completed
+                            |
+                            +-- Failed
+                                |
+                                +-- Enter Failure Reason
+                            |
+                            +-- Update Confirmation / Error
+```
+
+## 3. Critical Task Paths
+
+### Task A: Generate and Assign an Optimized Route
+
+**User:** Fleet Dispatcher
+
+**Shortest reasonable path:**
+
+Sign In → Dispatch Dashboard → Select Delivery Nodes → Select Available Driver → Generate Optimized Route → Review Route and ETAs → Confirm Assignment
+
+**Expected result:**  
+The system assigns the confirmed route to the selected driver and marks it Active.
+
+**Alternative path:**  
+If the route exceeds shift hours, the dispatcher follows the Manual Review / Adjust Route path before confirming the assignment.
+
+### Task B: Update Delivery Status
+
+**User:** Delivery Driver
+
+**Shortest reasonable path:**
+
+Sign In → Driver Dashboard → My Active Route → Next Delivery → Update Delivery Status → Submit Update
+
+**Expected result:**  
+The system saves the delivery status and displays confirmation.
+
+**Alternative path:**  
+If the driver selects Failed, the system requests a failure reason before saving the update. If saving fails, the system displays an error and does not falsely confirm success.
+
+## 4. Navigation Design Decisions
+
+1. **Role-based navigation:** Dispatchers and drivers are shown the screens relevant to their responsibilities.
+2. **Task-focused access:** Dispatchers can begin route creation directly from the Dispatch Dashboard.
+3. **Review before confirmation:** The proposed route is displayed before it becomes Active.
+4. **Short driver workflow:** Drivers can access their active route and next delivery without navigating through dispatcher screens.
+5. **Clear recovery paths:** Optimization errors and status-update failures provide a way to retry or return to the relevant task.
+6. **Accessible navigation:** Navigation controls must have descriptive labels, support keyboard access where applicable, and maintain visible focus indicators.
+7. **Permission enforcement:** Users cannot access role-restricted functions simply by entering a URL or selecting a hidden navigation option.
+
+## 5. Requirements Traceability
+
+| Project requirement | Navigation element |
+|---|---|
+| FR-01: Generate an optimized delivery route | Select Delivery Nodes → Generate Optimized Route |
+| FR-02: Manually reorder waypoints | Review Waypoint Sequence and ETAs → Manual Review / Adjust Route |
+| FR-03: Update delivery status | My Active Route → Update Delivery Status |
+| FR-04: Dynamically calculate ETA | Review Waypoint Sequence and ETAs |
+| FR-05: Assign or reassign routes | Select Driver → Confirm Assignment |
+| FR-08: View route history | Dispatcher Dashboard → Route History |
+
+## 6. Review Checklist
+
+- [ ] The primary dispatcher task has a clear starting point and completion point.
+- [ ] The driver can reach the next delivery with minimal navigation.
+- [ ] The dispatcher can review a route before confirming assignment.
+- [ ] Error and manual-review paths are represented.
+- [ ] Navigation respects user roles and permissions.
+- [ ] The navigation model is consistent with the project's API contract and requirements.
 
