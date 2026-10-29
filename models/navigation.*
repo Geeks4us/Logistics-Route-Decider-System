@@ -1,5 +1,10 @@
 # Navigation Model Notes
 
+**Project:** Logistics-Route-Decider-System (Group 01, Geeks4us)
+**Lab:** CSI473 Lab 10, studio block 20-44
+**Source:** `models/navigation.drawio` (editable; a Mermaid version is in `models/navigation.mmd`) | **Export:** `models/navigation.svg`
+**Related:** `docs/user-profile-and-tasks.md` (tasks T1, T2, T3 and success criteria)
+
 ## 1. Traceability
 
 | Link | Reference |
@@ -61,3 +66,5 @@ An *interaction* is a click, tap or key press that commits an action. Reading a 
 | Active route | `RouteManifest` with status `ACTIVE` |
 
 - Route Review corresponds to the `201` response of the generate operation; Confirm and Assign corresponds to the separate confirm operation named in the API contract.
+- **Gap to close:** the API contract does not yet define the **reassign** operation (FR-05) or the **record delivery outcome** operation (FR-03). T2 and T3 depend on them. Add them to `docs/api-contracts/` (or note them as planned) so the UI and API stay consistent.
+- Unauthorised and unavailable states (for example a driver opening a Dispatcher screen, or `NO_DRIVER_AVAILABLE` on generate) are designed in `docs/ui-states.md` (block 76-94).
