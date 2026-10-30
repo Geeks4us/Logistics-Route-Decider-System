@@ -1,0 +1,87 @@
+@startuml
+title Logistics Route Decider System — Component Architecture
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+left to right direction
+
+actor Dispatcher
+actor Driver
+actor Manager
+actor Customer
+
+package "Single Spring Boot application — one deployable artifact" {
+  component "HTTP / UI adapters\nSpring Web" as HTTP
+
+  package "Dispatch & Management" {
+    component "Dispatch application services" as DispatchApp
+    component "Dispatch domain model" as DispatchDomain
+    interface "RouteRepository" as RouteRepo
+    interface "OptimizeRouteUseCase" as OptimizeUseCase
+    DispatchApp --> DispatchDomain
+    DispatchApp --> RouteRepo
+    DispatchApp --> OptimizeUseCase
+  }
+
+  package "Optimization Engine" {
+    component "RouteOptimizationService" as OptimizationApp
+    component "Optimization request/result model" as OptimizationDomain
+    interface "RoutingEnginePort" as RoutingPort
+    OptimizationApp --> OptimizationDomain
+    OptimizationApp --> RoutingPort
+  }
+
+  package "Tracking & Notification" {
+    component "Tracking application services" as TrackingApp
+    component "Tracking/status domain rules" as TrackingDomain
+    interface "NotificationPort" as NotificationPort
+    TrackingApp --> TrackingDomain
+    TrackingApp --> NotificationPort
+  }
+
+  component "Spring composition root\nDependency injection" as Composition
+  HTTP --> DispatchApp
+  HTTP --> TrackingApp
+  OptimizeUseCase <|.. OptimizationApp
+  Composition ..> DispatchApp : wires
+  Composition ..> OptimizationApp : wires
+  Composition ..> TrackingApp : wires
+}
+
+package "Infrastructure adapters — same process" {
+  component "Relational persistence adapters" as Persistence
+  component "External routing adapter" as RoutingAdapter
+  component "Messaging adapter" as MessagingAdapter
+}
+database "One relational database" as DB
+cloud "External mapping / routing API" as MapAPI
+cloud "External messaging provider" as MessageAPI
+
+RouteRepo <|.. Persistence
+RoutingPort <|.. RoutingAdapter
+NotificationPort <|.. MessagingAdapter
+Persistence --> DB
+RoutingAdapter --> MapAPI
+MessagingAdapter --> MessageAPI
+
+Dispatcher --> HTTP
+Driver --> HTTP
+Manager --> HTTP
+Customer --> HTTP
+
+note bottom of HTTP
+  One deployable modular monolith.
+  Internal capability calls are in-process.
+  No broker or distributed locks in Phase 1.
+end note
+
+note right of DispatchApp
+  Dispatch calls the public
+  OptimizeRouteUseCase contract,
+  not the optimizer implementation.
+end note
+
+note right of RoutingPort
+  Provider choice is separate.
+  Provider SDK types stay in adapter.
+end note
+@enduml
