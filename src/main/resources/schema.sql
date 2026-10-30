@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS order_batch (
+  batch_id VARCHAR(80) PRIMARY KEY,
+  status VARCHAR(20) NOT NULL,
+  all_orders_confirmed BOOLEAN NOT NULL
+);
+CREATE TABLE IF NOT EXISTS delivery_route (
+  route_id VARCHAR(36) PRIMARY KEY,
+  batch_id VARCHAR(80) NOT NULL UNIQUE,
+  vehicle_id VARCHAR(80) NOT NULL,
+  driver_id VARCHAR(80) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  total_distance_km DOUBLE NOT NULL,
+  total_duration_minutes INTEGER NOT NULL,
+  CONSTRAINT fk_route_batch FOREIGN KEY (batch_id) REFERENCES order_batch(batch_id)
+);
+CREATE TABLE IF NOT EXISTS delivery_stop (
+  route_id VARCHAR(36) NOT NULL,
+  sequence_no INTEGER NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  PRIMARY KEY(route_id, sequence_no),
+  CONSTRAINT fk_stop_route FOREIGN KEY (route_id) REFERENCES delivery_route(route_id)
+);
+CREATE TABLE IF NOT EXISTS idempotency_record (
+  idempotency_key VARCHAR(120) PRIMARY KEY,
+  route_id VARCHAR(36) NOT NULL,
+  CONSTRAINT fk_idempotency_route FOREIGN KEY (route_id) REFERENCES delivery_route(route_id)
+);
