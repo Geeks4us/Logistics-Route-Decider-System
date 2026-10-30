@@ -4,10 +4,8 @@ import com.logistics.dispatch.domain.Route;
 import com.logistics.dispatch.ports.RouteRepository;
 import com.logistics.optimization.application.OptimizeRouteUseCase;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 
 /** Dispatch depends on the Optimization capability's public contract, not its implementation. */
-@Service
 public class DispatchService {
     private final RouteRepository routes;
     private final OptimizeRouteUseCase optimizer;
