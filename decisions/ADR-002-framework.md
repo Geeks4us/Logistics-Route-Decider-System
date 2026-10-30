@@ -6,22 +6,22 @@
 
 ## Context
 
-The Logistics Route Decider System needs a backend for dispatcher-facing HTTP operations, route-management use cases, validation, persistence integration, and background route-optimization work. The architecture remains the **Capability-Oriented Modular Monolith** selected in ADR-001: Dispatch & Management, Optimization Engine, and Tracking & Notification are capability modules in one deployable application.
+The Logistics Route Decider System needs a Java backend for dispatcher-facing HTTP operations, route-management use cases, validation, persistence integration, and background route-optimization work. The architecture remains the **Capability-Oriented Modular Monolith** selected in ADR-001: Dispatch & Management, Optimization Engine, and Tracking & Notification are capability modules in one deployable application.
 
-The framework must support clear module boundaries and dependency inversion. Framework and infrastructure code must not become dependencies of the domain model.
+The framework must support clear module boundaries and dependency inversion. Framework and infrastructure code must not become dependencies of the domain model or application services.
 
 ## Decision
 
 Use **Java 21 with Spring Boot 3.x** as the backend application framework.
 
 - Use Spring Web for REST controllers and HTTP request/response handling.
-- Use Spring dependency injection to wire application services and outbound adapters.
+- Use Spring dependency injection in the composition root to wire application services and outbound adapters.
 - Use Jakarta Bean Validation at request boundaries.
 - Use Spring Data/JDBC only in infrastructure adapters; domain and application code depend on repository ports.
 - Use managed asynchronous execution for long-running optimization jobs where needed.
-- Keep capability modules in one deployable application. Cross-module calls go through small, explicit application interfaces; publish local domain events for secondary effects.
+- Keep capability modules in one deployable application. Cross-module calls go through small, explicit application interfaces; publish local events for secondary effects.
 
-The framework is an outer-layer implementation detail. Core business rules and port interfaces remain plain Java and should be testable without starting the Spring container.
+Spring is an outer-layer implementation detail. Domain models, port interfaces, and application services remain plain Java and should be testable without starting the Spring container.
 
 ## Dependency direction
 
@@ -32,13 +32,12 @@ HTTP / Spring adapters
 Capability application services
         |
         v
-Domain model + owned port interfaces
-
-Infrastructure adapters (database, map provider, messaging)
+Domain model + capability-owned port interfaces
+        ^
         |
-        +------ implement / call the ports
+Infrastructure adapters implement outbound ports
 
-Composition root (Spring configuration) wires implementations.
+Spring composition root wires application services and adapter implementations.
 Core modules do not import adapter classes or provider SDKs.
 ```
 
@@ -51,7 +50,7 @@ Core modules do not import adapter classes or provider SDKs.
 
 ## Consequences
 
-- Add Spring dependencies at the application edge, not to domain entities or port interfaces.
+- Spring dependencies belong in HTTP/infrastructure adapters and the composition root, not in domain entities, port interfaces, or application services.
 - Enforce package/module boundaries in code review and tests.
 - Keep provider-specific SDK types out of public capability interfaces.
 - Use unit tests for domain/application logic and Spring integration tests for wiring and HTTP behaviour.
