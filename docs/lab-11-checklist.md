@@ -1,24 +1,24 @@
 # Laboratory 11 — Exit and Phase 2 Evidence Checklist
 
-Status reflects repository inspection on 30 October 2026. Mark complete only after evidence is committed and independently checked.
+Status on 30 October 2026; distinguish committed source from verified execution.
 
 - [x] Create lab-11 from reviewed lab-09 baseline.
-- [ ] Create stable pre-lab tag (tag-creation action unavailable in this session; tag still required).
-- [ ] Runnable approved UC-25 vertical slice crossing HTTP/API, application logic and persistent result.
-- [ ] README setup verified by clean checkout.
-- [ ] Java 21 build descriptor and reproducible dependency setup.
-- [ ] Database schema/migrations and synthetic sample data.
-- [ ] Automated unit test: successful route optimization.
-- [ ] Automated unit test: invalid business rule / validation rejection.
-- [ ] Automated test: authorization rejection.
-- [ ] Automated integration test: routing dependency failure and no partial persistence.
-- [ ] Test command and actual results summary recorded.
-- [x] Requirement/model-to-code-to-test reconciliation matrix created; gaps disclosed.
-- [x] Technical-debt/risk register and conditional release recommendation created.
-- [ ] Phase 2 report PDF at submissions/phase2-report.pdf.
-- [ ] Contribution record added and verified by team.
-- [ ] Create phase2-submission tag only after final reviewed commit.
-- [ ] Moodle Assignment 3 submitted by 23:59 Friday 30 October 2026 (student/team action; not performed here).
+- [ ] Create stable pre-lab tag.
+- [x] Implement HTTP → application workflow → routing port → transactional persistence vertical-slice source.
+- [x] Add Java 21 / Spring Boot Maven build descriptor and README setup/run instructions.
+- [x] Add H2 demo schema and synthetic Draft batch seed.
+- [x] Add automated HTTP integration tests for success, capacity rejection and unreachable stop.
+- [ ] Run mvn clean test on JDK 21 and record actual output.
+- [ ] Run application and complete five-minute demonstration from a clean checkout.
+- [x] Create requirement/model/code/test reconciliation and disclose differences.
+- [x] Create technical-debt/risk register and conditional release recommendation.
+- [ ] Add provider failure, shift/window, idempotency replay and transaction rollback tests.
+- [ ] Implement dispatcher authentication/authorization and test denial.
+- [ ] Replace demo H2 and synthetic routing before production.
+- [ ] Add Phase 2 report PDF at submissions/phase2-report.pdf.
+- [ ] Add and verify contribution record.
+- [ ] Create phase2-submission tag after final review.
+- [ ] Submit Moodle Assignment 3 by 23:59 Friday 30 October 2026 (team/student action).
 
-## Honest exit status
-Branch and Lab 11 review documents are present, but runnable vertical slice, executable tests, report PDF, contribution record and tags are not evidenced. Release recommendation remains **NO-GO** until blockers are resolved.
+## Current exit status
+The vertical-slice implementation and test sources are committed, but the build and tests have **not been executed here**. Do not claim the system is verified runnable until a Java 21/Maven environment successfully runs the documented commands. Production release remains NO-GO.
