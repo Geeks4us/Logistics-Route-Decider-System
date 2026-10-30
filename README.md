@@ -18,6 +18,9 @@ This branch adds an executable Spring Boot HTTP slice for UC-25 route optimizati
 
 **Scope limitations:** H2 is an in-memory demonstration database, not the approved production relational database/replica topology. The routing adapter is synthetic and is not live Mapbox. Vehicle/driver/order values are supplied in the demo request rather than loaded from full domain repositories. Authentication/authorization, real mapping, notifications, primary/replica deployment and operational controls are not implemented in this slice.
 
+## Phase 2 report
+The CSI473 Phase 2 report is in [`submissions/phase2-report.md`](submissions/phase2-report.md). The formatted Word and PDF copies are prepared separately for review; the PDF still needs to be added to `submissions/phase2-report.pdf` before the repository is submission-complete.
+
 ## Requirements
 - JDK 21
 - Maven 3.9+
