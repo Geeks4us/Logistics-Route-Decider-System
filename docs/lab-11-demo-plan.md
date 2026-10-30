@@ -1,28 +1,27 @@
 # Laboratory 11 — Five-Minute Demonstration Plan
 
 **Project:** Logistics Route Decider System  
-**Core use case:** UC-25 — Optimized delivery process  
-**Data policy:** synthetic orders, addresses, vehicle, driver and batch only.
+**Use case:** UC-25 — Optimize delivery route  
+**Data:** synthetic only; no live customer or provider data.
 
-## Demonstration flow (target once implementation is runnable)
+## Preparation
+- Install JDK 21 and Maven 3.9+.
+- From repository root run `mvn clean test`, then `mvn spring-boot:run`.
+- Confirm application is listening on port 8080.
+- H2 starts empty and seeds `BATCH-DEMO-001` as Draft with confirmed orders.
+- Use the sample request in README.md. Restart the app to reset the in-memory batch after a successful run.
 
-| Time | Presenter action | Evidence to show |
+## Five-minute sequence
+| Time | Action | Evidence |
 |---|---|---|
-| 0:00–0:45 | Sign in as dispatcher and select Draft batch with confirmed synthetic orders | Dispatcher interface/API request and batch state |
-| 0:45–1:45 | Submit optimization request with selected vehicle and driver | HTTP request, validation and application-service call |
-| 1:45–2:45 | Show route result and stop sequence/ETA | Routing port/adapter result and BR-01–BR-05 validation |
-| 2:45–3:45 | Show route/stops persisted and batch Draft → Optimized | Database query/repository evidence and transaction boundary |
-| 3:45–5:00 | Submit invalid or failing request; show controlled error/no partial route | Test output and unchanged Draft batch/no route record |
+| 0:00–0:45 | Explain UC-25 and synthetic Draft batch | Seed row in `data.sql`; H2 `order_batch` |
+| 0:45–1:45 | POST valid optimization request | `POST /api/routes/optimize`, controller and workflow |
+| 1:45–2:45 | Show HTTP 201 response, ordered stops and synthetic estimate | DeterministicRoutingAdapter and response JSON |
+| 2:45–3:45 | Query `delivery_route`, `delivery_stop` and `order_batch` | Persisted route, stops and Draft → Optimized |
+| 3:45–5:00 | Run capacity/unreachable failure tests | HTTP 422 and no partial route/batch mutation assertions |
 
-## Current readiness
-
-**Not runnable at review time.** Repository has no build descriptor, application entry point, HTTP controller, concrete persistence adapter, schema/migration or automated tests. Routing adapter is an unsupported-operation stub. Do not present this plan as a completed demonstration.
-
-## Minimum implementation and rehearsal gates
-1. Add reproducible Java 21 build and setup instructions.
-2. Implement dispatcher HTTP boundary and UC-25 workflow.
-3. Add synthetic seed batch/orders/vehicle/driver and persistence schema.
-4. Implement deterministic synthetic routing adapter for offline demo; label it clearly, not live Mapbox routing.
-5. Enforce business rules and atomic persistence/failure behaviour.
-6. Add and run unit and integration tests.
-7. Rehearse from clean checkout using README instructions; record command and observed output.
+## Honest limitations to disclose
+- DeterministicRoutingAdapter is synthetic and not live Mapbox.
+- H2 is in-memory demonstration persistence, not the primary/read-replica deployment design.
+- Authentication/authorization and full order/vehicle/driver repositories are not implemented.
+- Automated tests are authored but must be run locally; do not claim pass until output is observed.
