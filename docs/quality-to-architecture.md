@@ -1,41 +1,35 @@
-Quality Scenarios Mapped Across Architecture Alternatives
+# Quality Scenarios Mapped Across Architecture Alternatives
 
-1. Scalability Scenario
-Scenario Definition: The system shall support at least 50 concurrent web users and 1,000 delivery orders in a test dataset while maintaining route-management operations within the defined performance target of 15 minutes or less for route optimization.
+## 1. Scalability
 
-Architectural Impact Comparison:
- Option 1: 
-Capability-Oriented Modular Monolith (Selected)
- How it addresses the scenario: A single deployment instance handles 50 concurrent users comfortably, while the Optimization Engine uses asynchronous worker threads to process large datasets without freezing the dispatcher web UI.
- Option 2: 
-Traditional Layered (N-Tier) Monolith
- How it addresses the scenario: Struggles under high concurrency because business logic and data access are tightly coupled. Heavy dataset processing creates database connection bottlenecks, risking the 15-minute optimization target.
- Option 3: 
-Event-Driven Microservices Architecture
- How it addresses the scenario: Excellent at scaling specific components (like the optimization service) independently via cloud containers, but adds unnecessary complexity for supporting just 50 concurrent users.
+**Scenario:** Support at least 50 concurrent web users and 1,000 delivery orders while maintaining route optimization within 15 minutes.
 
-2. Planning Efficiency Scenario
- Scenario Definition: When a dispatcher uploads or selects a batch of delivery orders, the system shall automatically generate an optimized route within 15 minutes for at least 95% of batches containing up to 100 orders, reducing manual planning time from ~2 hours to under 15 minutes.
-Architectural Impact Comparison:
- Option 1: 
-Capability-Oriented Modular Monolith (Selected)
- How it addresses the scenario: In-memory data passing between the Dispatch subsystem and the Optimization Engine ensures rapid batch processing well within the 15-minute window without network serialization overhead.
- Option 2: 
-Traditional Layered (N-Tier) Monolith
- How it addresses the scenario: Batch processing triggers cascading calls through horizontal tiers (UI \bm{\rightarrow} Logic \bm{\rightarrow} Data), increasing execution time and making it difficult to guarantee the 95% success rate under load.
- Option 3: 
-Event-Driven Microservices Architecture
- How it addresses the scenario: Batch payloads must be serialized, sent across a message broker, and processed externally. While isolated, the network transport overhead can occasionally breach strict timing SLAs for medium-sized batches.
+- **Selected architecture:** The API Gateway provides a controlled ingress point and can be scaled independently. The application uses asynchronous workers for optimization. The database replica may serve designated read-heavy dashboard/history queries that tolerate replication lag. Optimization writes and consistency-sensitive reads remain on the primary.
+- **Traditional layered monolith:** Can meet the scenario with sufficient capacity, but capability boundaries may become harder to maintain.
+- **Event-driven microservices:** Offers independent service scaling, but introduces broker, deployment and distributed-state complexity not currently justified.
 
-3. Data Integrity Scenario
- Scenario Definition: For 100% of successfully completed order and route transactions, the system shall preserve the correct order details, vehicle assignment, route state, and delivery status without unintended duplication or loss.
-Architectural Impact Comparison:
- Option 1: 
-Capability-Oriented Modular Monolith (Selected)
- How it addresses the scenario: Relies on robust local relational database transactions within clear domain boundaries. This ensures atomic updates to route states and driver assignments with zero risk of distributed state sync errors.
- Option 2: 
-Traditional Layered (N-Tier) Monolith
- How it addresses the scenario: Centralized database access maintains strong consistency initially, but as the codebase grows and layers blur, accidental cross-layer data mutations increase the risk of race conditions and orphaned records.
- Option 3: 
-Event-Driven Microservices Architecture
- How it addresses the scenario: Because services have decentralized data stores, maintaining data integrity across a completed route transaction requires complex distributed transactions (Sagas or two-phase commits), introducing potential points of failure and data drift.
+## 2. Planning efficiency
+
+**Scenario:** Generate an optimized route within 15 minutes for at least 95% of batches containing up to 100 orders.
+
+- **Selected architecture:** Dispatch invokes the Optimization Engine through an in-process application interface. The gateway routes the client request but does not participate in optimization logic. The optimization worker uses the external routing provider through a port and persists the result transactionally to the primary database.
+- **Traditional layered monolith:** Can support the use case, but horizontal-layer dependencies may make capability ownership less explicit.
+- **Event-driven microservices:** Adds network and broker boundaries to the optimization workflow.
+
+## 3. Data integrity
+
+**Scenario:** Preserve order details, vehicle/driver assignment, route state and delivery status without unintended duplication or loss.
+
+- **Selected architecture:** The primary relational database is authoritative. Related state changes are committed in a local transaction, protected by foreign keys, uniqueness constraints and optimistic version checks. The replica is read-only and is not used for decisions that require read-after-write consistency.
+- **Traditional layered monolith:** A shared relational database can provide strong transactional integrity, but unclear layer ownership can permit accidental cross-layer mutations.
+- **Event-driven microservices:** Decentralized stores require eventual-consistency handling and distributed workflow coordination.
+
+## 4. Availability and recovery
+
+**Scenario:** An unavailable mapping or messaging provider must not create a partially persisted route or corrupt delivery state.
+
+- **Selected architecture:** Infrastructure adapters enforce timeouts and bounded retries. The application returns a clear failure response and leaves the batch/route in its prior valid state when optimization cannot complete. The gateway propagates the application error response. Primary/replica health and replication lag are monitored separately.
+- **Traditional layered monolith:** Can isolate provider calls, but boundaries may be less explicit.
+- **Event-driven microservices:** Can isolate failures by service, but recovery requires coordination across distributed services and data stores.
+
+**Verification note:** These are architectural responses to the target scenarios, not evidence that performance, availability or recovery targets have already passed tests. Record test results separately.
