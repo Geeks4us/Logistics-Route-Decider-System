@@ -22,7 +22,7 @@ The Logistics Route Decider System is a proposed web-based logistics planning an
 
 The principal architecture decision is a capability-oriented modular monolith, organized around Dispatch & Management, Optimization Engine, and Tracking & Notification. The wider target design retains an API Gateway and a relational database primary/read-replica topology. The Phase 2 implementation is a narrower UC-25 vertical slice: a Spring Boot HTTP endpoint validates a demo batch and request-supplied constraints, invokes a deterministic synthetic routing adapter, and persists a route, stops, batch transition and idempotency record in an H2 in-memory database.
 
-The repository contains integration-test source for successful optimization, capacity rejection and unreachable-stop rejection. GitHub Actions run 41083004623 completed successfully for commit `7b409760043642922ea04962364a395781d65bc4`. The current branch head subsequently changed workflow dependency wiring at `cdca3d13c402415487782baab6c76fc32aa09cd1`; that later head must be re-run through CI before its test status is claimed. The demonstrator is not production-ready: routing is synthetic, H2 is in-memory, request values are not loaded from authoritative repositories, and authentication/authorization is absent.
+The repository contains integration-test source for successful optimization, capacity rejection and unreachable-stop rejection. GitHub Actions run 41083022114 (run 2) completed successfully for code commit `cdca3d13c402415487782baab6c76fc32aa09cd1`; the job's Maven test step completed successfully. The report-only commit does not change application source. The test result is therefore verified for the current application code, though the team should still perform a clean-checkout local launch and demonstration. The demonstrator is not production-ready: routing is synthetic, H2 is in-memory, request values are not loaded from authoritative repositories, and authentication/authorization is absent.
 
 ## 2. Problem evidence, stakeholders and scope
 ### Problem statement
@@ -213,7 +213,7 @@ The Phase 2 vertical slice is UC-25 route optimization. It crosses REST API, app
 | Idempotency replay/concurrency | Same key returns original result; concurrent requests handled safely. | Not covered. |
 | Authentication/authorization | Unauthenticated/non-dispatcher request denied. | Not implemented; security blocker. |
 
-CI run 41083004623 (“Lab 11 Java CI”) completed successfully for commit `7b409760043642922ea04962364a395781d65bc4`; its Maven “Run tests” step completed successfully. Current branch head `cdca3d13c402415487782baab6c76fc32aa09cd1` is a later change routing workflow through the Optimization capability application contract. The earlier green run does not prove the current head; re-run CI against the final report commit and record the final result.
+CI run 41083022114 (“Lab 11 Java CI”, run 2) completed successfully for application-code commit `cdca3d13c402415487782baab6c76fc32aa09cd1`; its Maven “Run tests” step completed successfully. The subsequent report-only commit does not change application source. A clean-checkout local launch and five-minute demonstration are still required.
 
 No performance/load, security, accessibility, provider-resilience, database replication, production deployment or user-acceptance tests are claimed. A local manual launch and five-minute demonstration remain necessary evidence.
 
@@ -245,7 +245,7 @@ The branch history includes Lab 11 documentation, build descriptor, application 
 ## 16. Academic integrity and AI-use record
 AI assistance was used to help organize and draft this report from the team's existing repository artefacts, summarize design/implementation evidence, and prepare report files. Repository edits and report wording should be reviewed by all team members. The team remains responsible for accuracy, originality, citation correctness and compliance with University of Botswana/CSI473 rules.
 
-Verification disclosure: the report distinguishes repository source from executed evidence. A successful GitHub Actions run is recorded for commit `7b409760043642922ea04962364a395781d65bc4`; the later current branch head `cdca3d13c402415487782baab6c76fc32aa09cd1` requires its own CI run. No lecturer approval signature, local manual demo, performance/security testing, production deployment or Moodle submission is claimed. Add any additional tools/assistance used and follow the lecturer's required AI-use disclosure format.
+Verification disclosure: the report distinguishes repository source from executed evidence. A successful GitHub Actions run is recorded for application-code commit `cdca3d13c402415487782baab6c76fc32aa09cd1` (run 41083022114). No lecturer approval signature, local manual demo, performance/security testing, production deployment or Moodle submission is claimed. Add any additional tools/assistance used and follow the lecturer's required AI-use disclosure format.
 
 ## References
 1. University of Botswana, Department of Computer Science. *CSI473 Project Design Report Template*, Semester 1, 2026/27.
