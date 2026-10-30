@@ -1,16 +1,16 @@
 # Acceptance Criteria: Delivery Route Assignment
 
-This document details the Given-When-Then acceptance criteria for functional requirements `FR-01` through `FR-03`, linked to **UC-01: Assign Delivery Route**.
+This document details the Given-When-Then acceptance criteria for functional requirements `FR01` through `FR05`, linked to **UC-01: Create and Evaluate a Delivery Batch**.
 
 ---
 
-## UC-01: Assign Delivery Route
+## UC-01: Create and Evaluate a Delivery Batch
 
 ### AC-01: Successful Route Assignment (Happy Path)
 * **Given** a logged-in Dispatcher viewing a pending delivery route with status `Draft`
 * **And** at least one driver with status `Available` and matching vehicle capacity is registered in the system
 * **When** the Dispatcher selects an available driver and confirms the assignment
-* **Then** the route status updates from `Draft` to `Dispatched`
+* **Then** the route status updates from `Draft` to `Assigned`
 * **And** the assigned driver's system status updates to `On Duty / Assigned`
 * **And** a real-time dispatch alert containing route details is delivered to the driver's mobile device.
 
@@ -38,7 +38,7 @@ This document details the Given-When-Then acceptance criteria for functional req
 
 ## Design Rationale
 
-* **Choice Made:** Implemented synchronous capacity validation and optimistic entity locking on the route assignment process before changing state to `Dispatched`.
+* **Choice Made:** Implemented synchronous capacity validation and optimistic entity locking on the route assignment process before changing state to `Assigned`.
 * **Realistic Alternative Considered:** Asynchronous background validation where the assignment is saved immediately and flagged later if weight limits are violated.
 * **Consequence Accepted:** Small increase in request latency (~100–150ms) during validation checks, accepted in favor of preventing overweight delivery vehicles from leaving the depot.
 
@@ -48,6 +48,6 @@ This document details the Given-When-Then acceptance criteria for functional req
 
 | Acceptance Criteria | Target Requirement | Target Actor | Verification Method |
 | :--- | :--- | :--- | :--- |
-| **`AC-01`** | `FR-01` (Assign Route) | Dispatcher, Driver | Automated End-to-End Test |
-| **`AC-02`** | `FR-02` (Capacity Validation) | Dispatcher | Automated Unit/Integration Test |
-| **`AC-03`** | `FR-03` (Concurrency Control) | Dispatcher | Integration Test / Load Simulation |
+| **`AC-01`** | `FR01` (Create Batch) / `FR05` (State Progression) | Dispatcher, Driver | Automated End-to-End Test |
+| **`AC-02`** | `FR03` (Capacity Validation) | Dispatcher | Automated Unit/Integration Test |
+| **`AC-03`** | `FR05` (Concurrency Control / State Integrity) | Dispatcher | Integration Test / Load Simulation |
