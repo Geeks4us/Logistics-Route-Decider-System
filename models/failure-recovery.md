@@ -2,78 +2,54 @@
 
 **System:** Logistics Route Decider System (CSI473 Group 01 - Geeks4us)  
 **Document Ref:** FR-001  
+**Applies to:** Phase 1 Capability-Oriented Modular Monolith
 
 ---
 
-## 1. Overview
+## 1. Scope and architectural assumptions
 
-In a distributed logistics platform, network partitions, upstream API outages, and client retries are inevitable. This document formally models the system's fault-tolerance, circuit breaking, graceful degradation, and idempotency-locking mechanisms to guarantee system reliability and prevent cascading failures.
+Phase 1 is a single deployable modular monolith with one relational database. This document therefore does not assume an API gateway, multiple application nodes, Redis, distributed locks, or a message broker. Those technologies may be evaluated later, but require an explicit architecture decision and operational justification.
 
----
+The system delegates base distance, travel-time, and routing calculations to an external mapping API under D-001. It does not introduce a separate heuristic routing engine as an implicit fallback.
 
-## 2. Failure & Recovery Model: Unavailable External Dependency
+## 2. External mapping API failure
 
-When external geospatial routing engines or map providers experience latency spikes or complete outages, the system prevents thread exhaustion and service crashes using a **Circuit Breaker** and **Graceful Degradation** pattern.
+The Optimization application calls the mapping provider through `RoutingEnginePort`. The provider-specific adapter is responsible for applying a finite connection/request timeout and translating provider errors into application-level failures.
 
-### Interaction Flow
+Phase 1 behaviour:
 
-    [Client / Dispatcher] 
-           │
-           ▼ (1. Route Request with X-Request-Id)
-    [Route Decider Service] 
-           │
-           ├─► [Redis Cache] ──(Hit / Near Match)──► Return Cached Route
-           │
-           ▼ (Cache Miss)
-    [Circuit Breaker] ──(OPEN)──► [Fallback Engine] ──► Generate Heuristic / Skeleton Path
-           │
-           ├─► (CLOSED) 
-           ▼
-    [External Routing API] ──(Timeout / Failure > Threshold)──► Trip Circuit Breaker
+1. Validate the optimization request before making an external call.
+2. Invoke the mapping provider through `RoutingEnginePort` with a configured timeout.
+3. If the provider succeeds, return the calculated route data to the application service.
+4. If the provider times out, is unavailable, or rejects the request, return a clear optimization failure to Dispatch. Do not silently invent a route or claim that an approximate route is optimized.
+5. Keep the route in its prior valid state; do not advance it to `Optimized` or `Assigned` when calculation has failed.
+6. Record a diagnostic event/log with a correlation identifier and provider error category, without logging customer-sensitive address/contact data unnecessarily.
 
-### Step-by-Step Breakdown
+A bounded retry may be added for transient errors only if it respects the provider's rate limits and an overall request deadline. A circuit breaker can be introduced if measured failure rates justify it; it is not a prerequisite for the initial skeleton.
 
-1. **Request Ingestion & Validation:** The client dispatches a route calculation payload containing origin, destination, and waypoints alongside an idempotency key (`X-Request-Id`).
-2. **Primary Dependency Timeout:** The service invokes the external geospatial routing dependency. Due to upstream degradation, the network call hangs and breaches the strict 3,000ms timeout budget.
-3. **Circuit Breaker Trip:** The internal Circuit Breaker monitors failure rates. Once failures exceed the configured threshold (e.g., 5 consecutive failures within 10 seconds), the circuit state transitions from **Closed** to **Open**, short-circuiting subsequent live calls.
-4. **Graceful Degradation & Fallback:** Rather than returning a hard `504 Gateway Timeout` to the dispatcher, the service executes its fallback strategy:
-   * Queries the **Redis Cache** for pre-calculated regional skeleton paths.
-   * Applies a secondary heuristic routing algorithm (straight-line distance + historical traffic weight) to compute a safe approximate route.
-5. **Response Delivery & Auditing:** The route decision is returned with an explicit response header (`X-Route-Status: Degraded-Fallback`), while an error telemetry event is dispatched to monitoring tools.
-6. **Self-Healing & Probing:** A background health-check probe periodically pings the primary dependency. Upon receiving successive successful health responses, the Circuit Breaker transitions to **Half-Open**, permits a controlled test request, and fully resets to **Closed**.
+Caching or a secondary mapping provider may be considered under D-001's stated consequences, but must be designed and documented before implementation. A cached result must be clearly marked with its age and suitability; it must not be represented as a fresh live calculation.
 
----
+## 3. Concurrency and duplicate dispatch attempts
 
-## 3. Concurrency Model: Duplicate Requests & Idempotency Locking
+D-002 places constraint validation and state-transition rules in the Java application core and requires explicit concurrency protection. Phase 1 uses the relational database transaction and optimistic versioning/locking for route and driver assignment records.
 
-When network timeouts cause mobile apps or dispatch clients to retry requests, duplicate payloads bearing the same `X-Request-Id` can create race conditions, redundant graph calculations, and extra third-party API billing. 
+1. A dispatcher submits an assignment request with the route/driver identifiers and the version last observed by the client.
+2. The application validates vehicle capacity, driver availability, and the permitted route-state transition.
+3. The application persists the assignment in a database transaction using a version column or equivalent optimistic-lock mechanism.
+4. If another dispatcher has changed the route or driver first, the update affects no current version and the transaction fails with a concurrency conflict.
+5. The application returns a conflict response and asks the client to refresh the route/driver availability.
+6. The transaction ensures that a failed assignment does not leave a partially updated route or driver record.
 
-### Interaction Flow
+If API-level idempotency keys are later required for retries, store their status/result in the relational database within the same transactional boundary. A Redis distributed lock is not required for a single-instance Phase 1 deployment.
 
-    [Client Req-A] ──┐
-                     ├──► [API Gateway / Nodes] ──► [Redis Distributed Lock (NX EX 30)]
-    [Client Req-B] ──┘                                        │
-                                                ┌─────────────┴─────────────┐
-                                                ▼                           ▼
-                                        [Node A: Acquires Lock]     [Node B: Lock Fails]
-                                                │                           │
-                                                ▼                           ▼
-                                        [Ledger: PENDING]           [Poll Ledger / 409 Conflict]
-                                                │
-                                                ▼
-                                        [Route Calculation]
-                                                │
-                                                ▼
-                                        [Ledger: COMPLETED & Release Lock]
+## 4. Deferred mechanisms
 
-### Step-by-Step Breakdown
+The following are explicitly deferred and must not be treated as current architecture:
 
-1. **Concurrent Arrival:** Identical requests (`Req-A` and `Req-B`) arrive simultaneously at different API gateway nodes with the same `X-Request-Id`.
-2. **Atomic Distributed Lock Acquisition:** Both nodes attempt an atomic Redis lock acquisition:
-   `SET lock:idempotency:<uuid> node_id NX EX 30`
-   * **Node A** succeeds.
-   * **Node B** fails because the lock key already exists.
-3. **Ledger Initialization:** Node A queries the Idempotency Ledger table/cache, finding no existing entry, and inserts a `status = PENDING` record.
-4. **Alternate Path Handling:** Because Node B failed to acquire the distributed lock, it avoids duplicate computation. It enters a short-poll retry loop or queries the Idempotency Ledger, observing that the request is currently `PENDING`.
-5. **Route Computation & Ledger Finalization:** Node A computes the optimal route, serializes the response, updates the ledger record to `status = COMPLETED` with the payload result, and releases the distributed lock (`DEL`).
-6. **Cache Hit & Replay:** Subsequent duplicate requests bypass the route engine entirely, instantly returning the cached payload from the Idempotency Ledger.
+- Redis cache or distributed locks
+- Multiple application nodes and API gateway routing
+- A custom heuristic/fallback route engine
+- A message broker or distributed transaction protocol
+- Automatic background health-probe orchestration
+
+Revisit these only when deployment topology, measured traffic, provider reliability, or recovery requirements demonstrate a concrete need. Record any adoption in a new ADR and update ADR-001, ADR-002, and this document together.
