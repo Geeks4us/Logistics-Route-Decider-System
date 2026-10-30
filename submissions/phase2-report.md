@@ -251,7 +251,7 @@ Verification disclosure: the report distinguishes repository source from execute
 1. University of Botswana, Department of Computer Science. *CSI473 Project Design Report Template*, Semester 1, 2026/27.
 2. Geeks4us, *Logistics Route Decider System*, branch `lab-11`: https://github.com/Geeks4us/Logistics-Route-Decider-System/tree/lab-11
 3. Repository artefacts: `docs/problem-and-scope.md`; `docs/project-proposal-and-approval.md`; `docs/requirements.md`; `docs/acceptance-criteria.md`; `docs/quality-scenarios.md`; `docs/business-rules.md`; `docs/stakeholders.md`; `docs/crc-cards.md`; `docs/reconciliation-matrix.md`; `docs/technical-debt-and-risks.md`; `decisions/ADR-001-architecture.md`; `decisions/ADR-002-framework.md`; `glossary.md`; `models/logic-data-model.md`; `models/failure-recovery.md`.
-4. GitHub Actions, *Lab 11 Java CI*, run 41083004623: https://github.com/Geeks4us/Logistics-Route-Decider-System/actions/runs/41083004623 (successful for commit 7b409760043642922ea04962364a395781d65bc4).
+4. GitHub Actions, *Lab 11 Java CI*, run 41086170458: https://github.com/Geeks4us/Logistics-Route-Decider-System/actions/runs/41086170458 (successful for commit 2b5c8f71096ee083b81179c1645e960b9c6e354b).
 
 ## Appendices
 - **Appendix A — Supporting evidence:** signed project approval form; traceability matrix; ADR-001 and ADR-002; detailed UC-25; API contract; logical data model; deployment model; failure/recovery model; test logs; team contribution record.
