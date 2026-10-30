@@ -1,0 +1,85 @@
+@startuml
+title Logistics Route Decider — UML Deployment Model
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam wrapWidth 220
+
+node "Dispatcher Workstation" as dispatcher {
+  artifact "Dispatcher Web Browser" as web
+}
+
+node "Driver Mobile Device" as mobile {
+  artifact "Driver Mobile App" as app
+}
+
+node "Edge / DMZ" as edge {
+  node "API Gateway" as gateway {
+    artifact "Gateway Configuration" as gatewaycfg
+    artifact "TLS, authentication, rate-limit and routing policies" as policies
+  }
+}
+
+node "Application Network" as appnet {
+  node "Logistics Route Decider Application Node" as appnode {
+    node "Java 21 Runtime / Spring Boot 3.x" as jvm {
+      artifact "Logistics Route Decider Application" as system {
+        component "Dispatch & Management Module" as dispatch
+        component "Optimization Engine Module" as optimize
+        component "Tracking & Notification Module" as tracking
+      }
+    }
+  }
+}
+
+database "Primary Relational Database" as primary {
+  artifact "Operational schema: Orders, Batches, Routes, Stops, Drivers, Vehicles, Users" as schema
+}
+
+database "Read Replica" as replica {
+  artifact "Replicated read-only schema" as readschema
+}
+
+cloud "External Mapping / Routing Provider" as mapping {
+  artifact "Geocoding, road distance and travel-time API" as mapapi
+}
+
+cloud "External Messaging Provider" as messaging {
+  artifact "Push / SMS notification API" as notifyapi
+}
+
+web --> gateway : HTTPS
+app --> gateway : HTTPS
+gateway --> system : Protected HTTP / REST
+system --> primary : SQL over TLS\nwrite + consistency-sensitive reads
+primary --> replica : Asynchronous replication
+system --> replica : SQL read-only\nstale-tolerant queries only
+optimize --> mapping : HTTPS via RoutingEnginePort
+tracking --> messaging : HTTPS via NotificationPort
+
+note right of gateway
+Gateway is a separate edge deployment.
+It handles transport concerns only;
+business rules remain in application modules.
+end note
+
+note right of primary
+Primary is the sole write authority.
+Route optimization and dispatch transactions
+must use the primary database.
+end note
+
+note bottom of replica
+Replica is not writable and may lag.
+No automatic failover is implied unless
+configured and tested separately.
+end note
+
+note bottom of system
+Three capability modules run in one deployable
+application/runtime. Dispatch invokes Optimization
+through an in-process application interface.
+No broker or independently deployed microservices
+are assumed in this phase.
+end note
+
+@enduml
