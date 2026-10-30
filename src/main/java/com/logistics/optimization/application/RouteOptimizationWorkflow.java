@@ -2,7 +2,7 @@ package com.logistics.optimization.application;
 import com.logistics.optimization.api.OptimizeRouteRequest;
 import com.logistics.optimization.domain.RouteOptimizationRequest;
 import com.logistics.optimization.domain.RouteOptimizationResult;
-import com.logistics.optimization.ports.RoutingEnginePort;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -13,8 +13,8 @@ import java.util.UUID;
 
 @Service
 public class RouteOptimizationWorkflow {
- private final JdbcTemplate jdbc; private final RoutingEnginePort routing;
- public RouteOptimizationWorkflow(JdbcTemplate jdbc,RoutingEnginePort routing){this.jdbc=jdbc;this.routing=routing;}
+ private final JdbcTemplate jdbc; private final OptimizeRouteUseCase optimizer;
+ public RouteOptimizationWorkflow(JdbcTemplate jdbc,OptimizeRouteUseCase optimizer){this.jdbc=jdbc;this.optimizer=optimizer;}
  @Transactional
  public OptimizationResponse optimize(OptimizeRouteRequest request,String key){
   if(key==null||key.isBlank())throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Idempotency-Key header is required");
@@ -25,7 +25,7 @@ public class RouteOptimizationWorkflow {
   if(!"Draft".equals(batch.status())||!batch.confirmed())throw new ResponseStatusException(HttpStatus.CONFLICT,"Batch must be Draft and all orders confirmed");
   if(request.totalWeightKg()>request.vehicleMaxWeightKg()||request.totalVolumeM3()>request.vehicleMaxVolumeM3())throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,"Vehicle capacity exceeded");
   RouteOptimizationResult result;
-  try{result=routing.calculate(new RouteOptimizationRequest(request.stops().stream().map(OptimizeRouteRequest.StopRequest::address).toList()));}
+  try{result=optimizer.optimize(new RouteOptimizationRequest(request.stops().stream().map(OptimizeRouteRequest.StopRequest::address).toList()));}
   catch(RuntimeException ex){throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"Routing dependency failed",ex);}
   if(request.stops().stream().anyMatch(s->!s.reachable()))throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,"Route contains an unreachable stop");
   int driveMinutes=(int)Math.ceil(result.totalDistanceKm()*2);
